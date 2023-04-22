@@ -27,17 +27,19 @@ socket.once("oldUsers", (oldUsers) => {
 });
 socket.once("oldCanvas", (canvasImage) => canvasImage && (latestCanvasImage.src = canvasImage));
 
-socket.on("updateCanvas", (canvasImage) => (latestCanvasImage.src = canvasImage));
+socket.on("updateCanvas", (canvasImage) => {
+  if (pressing && (currentMode === 0 || currentMode === 1)) {
+    sendImage();
+  }
+
+  latestCanvasImage.src = canvasImage;
+});
 socket.on("join", (username) => users.push(username) && updateUserList());
 socket.on("leave", (username) => users.splice(users.indexOf(username), 1) && updateUserList());
 
 socket.emit("setName", username);
 
-latestCanvasImage.addEventListener("load", () =>
-  (currentMode === 0 || currentMode === 1) && pressing
-    ? sendImage() && drawLatestImage()
-    : drawLatestImage()
-);
+latestCanvasImage.addEventListener("load", () => drawLatestImage());
 
 window.addEventListener("DOMContentLoaded", () => {
   for (let mode of modes) {
