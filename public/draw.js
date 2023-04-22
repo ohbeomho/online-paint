@@ -127,8 +127,7 @@ canvas.addEventListener("mouseup", (e) => {
   clickPos = dragPos = undefined;
   tick = 0;
 
-  latestCanvasImage.src = canvas.toDataURL();
-  socket.emit("updateCanvas", latestCanvasImage.src);
+  sendImage();
 });
 
 function updateUserList() {
