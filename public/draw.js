@@ -33,7 +33,11 @@ socket.on("leave", (username) => users.splice(users.indexOf(username), 1) && upd
 
 socket.emit("setName", username);
 
-latestCanvasImage.addEventListener("load", () => drawLatestImage());
+latestCanvasImage.addEventListener("load", () =>
+  (currentMode === 0 || currentMode === 1) && pressing
+    ? sendImage() && drawLatestImage()
+    : drawLatestImage()
+);
 
 window.addEventListener("DOMContentLoaded", () => {
   for (let mode of modes) {
@@ -97,8 +101,7 @@ canvas.addEventListener("mousemove", (e) => {
     tick++;
 
     if (tick >= 50) {
-      latestCanvasImage.src = canvas.toDataURL();
-      socket.emit("updateCanvas", latestCanvasImage.src);
+      sendImage();
 
       tick = 0;
     }
@@ -145,4 +148,9 @@ function drawLatestImage() {
   } else {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
+}
+
+function sendImage() {
+  latestCanvasImage.src = canvas.toDataURL();
+  socket.emit("updateCanvas", latestCanvasImage.src);
 }
