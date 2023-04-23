@@ -3,6 +3,8 @@ const username = new URLSearchParams(location.search).get("username");
 const users = [username];
 const userList = document.querySelector(".user-list");
 const modeSelector = document.querySelector(".mode-selector");
+const chatInput = document.querySelector(".chat-input");
+const chatList = document.querySelector(".chat-list");
 
 const canvas = document.querySelectorAll("canvas")[0];
 const previewCanvas = document.querySelectorAll("canvas")[1];
@@ -99,8 +101,17 @@ socket.on("draw", (data, username) => {
 
   sendImage();
 });
-socket.on("join", (username) => users.push(username) && updateUserList());
-socket.on("leave", (username) => users.splice(users.indexOf(username), 1) && updateUserList());
+socket.on("join", (username) => {
+  users.push(username);
+  addMessage(`'${username}' joined.`, "notice");
+  updateUserList();
+});
+socket.on("leave", (username) => {
+  users.splice(users.indexOf(username), 1);
+  addMessage(`'${username}' leaved.`, "notice");
+  updateUserList();
+});
+socket.on("chat", (message, username) => addMessage({ username, text: message }, "chat"));
 
 socket.emit("setName", username);
 
@@ -142,6 +153,21 @@ window.addEventListener("DOMContentLoaded", () => {
 window.addEventListener("resize", () => {
   previewCanvas.style.left = `${canvas.offsetLeft + 1}px`;
   previewCanvas.style.top = `${canvas.offsetTop + 1}px`;
+});
+
+chatInput.addEventListener("keydown", (e) => {
+  if (!e.repeat && e.key === "Enter" && !e.shiftKey) {
+    e.preventDefault();
+
+    if (!chatInput.value.trim()) {
+      return;
+    }
+
+    addMessage({ username, text: chatInput.value }, "chat");
+    socket.emit("chat", chatInput.value);
+
+    chatInput.value = "";
+  }
 });
 
 previewCanvas.addEventListener("mousedown", (e) => {
@@ -253,4 +279,20 @@ function sendImage() {
 
 function sendDraw(data) {
   socket.emit("draw", { mode: currentMode, ...data });
+}
+
+function addMessage(message, type) {
+  const chatElement = document.createElement("li");
+  if (type === "notice" || (type === "chat" && message.username === username)) {
+    chatElement.classList.add(type === "notice" ? "notice" : "me");
+  }
+
+  chatElement.innerHTML =
+    type === "chat"
+      ? `<div class="username">${message.username}</div>
+         <div class="content">${message.text}</div>`
+      : `<div>${message}</div>`;
+
+  chatList.appendChild(chatElement);
+  chatList.scrollTo(0, chatList.scrollHeight);
 }

@@ -9,6 +9,7 @@ type ClientToServerEvents = {
   setName: (username: string) => void;
   updateCanvas: (canvasImage: string) => void;
   draw: (data: any) => void;
+  chat: (message: string) => void;
 };
 
 type SetNameResponse = {
@@ -24,6 +25,7 @@ type ServerToClientEvents = {
   join: (username: string) => void;
   leave: (username: string) => void;
   draw: (data: any, username: string) => void;
+  chat: (message: string, username: string) => void;
 };
 
 type SocketData = {
@@ -68,15 +70,27 @@ io.on("connection", (socket) => {
   });
 
   socket.on("updateCanvas", (canvasImage) => (latestCanvasImage = canvasImage));
-  socket.on("draw", (data) => socket.broadcast.emit("draw", data, String(socket.data.username)));
+  socket.on(
+    "draw",
+    (data) => socket.data.username && socket.broadcast.emit("draw", data, socket.data.username)
+  );
+  socket.on(
+    "chat",
+    (message) =>
+      socket.data.username && socket.broadcast.emit("chat", message, socket.data.username)
+  );
   socket.on("disconnect", () => {
-    onlineUsers.splice(onlineUsers.indexOf(String(socket.data.username)), 1);
+    if (!socket.data.username) {
+      return;
+    }
+
+    onlineUsers.splice(onlineUsers.indexOf(socket.data.username), 1);
 
     if (onlineUsers.length === 0) {
       latestCanvasImage = undefined;
     }
 
-    socket.broadcast.emit("leave", String(socket.data.username));
+    socket.broadcast.emit("leave", socket.data.username);
   });
 });
 

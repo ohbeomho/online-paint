@@ -1,0 +1,100 @@
+.user-list {
+  width: 70vw;
+  min-width: 1000px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(4, 20px);
+  gap: 5px;
+  padding: 10px;
+  position: absolute;
+  bottom: 0;
+  user-select: none;
+}
+
+.user-list div {
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 10px;
+}
+
+.mode-selector {
+  background-color: rgba(0, 0, 0, 0.7);
+  width: 40px;
+  position: absolute;
+  right: 0;
+  user-select: none;
+}
+
+.mode-selector .selected {
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.draw-username {
+  background-color: rgba(0, 0, 0, 0.4);
+  color: lightgray;
+  border-radius: 5px;
+}
+
+.chat {
+  padding: 5px;
+  margin: 0;
+  width: 250px;
+  height: 400px;
+  background-color: rgba(0, 0, 0, 0.7);
+  position: absolute;
+  left: 0;
+  text-align: left;
+}
+
+.chat-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 300px;
+  overflow: auto;
+}
+
+.chat .chat-input {
+  padding: 2px;
+  width: calc(100% - 4px);
+  height: 96px;
+}
+
+.chat-list li {
+  padding: 2.5px;
+  color: white;
+  margin-bottom: 8px;
+}
+
+.chat-list li .username {
+  font-weight: bold;
+  width: max-content;
+  background-color: rgba(0, 0, 0, 0.4);
+  padding: 3px;
+  border-radius: 5px;
+}
+
+.chat-list li .content {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.chat-list li.me .username {
+  background-color: white;
+  color: black;
+}
+
+.chat-list li.notice {
+  color: rgb(150, 150, 150);
+}
+
+canvas {
+  border: 1px solid black;
+}
+
+canvas:nth-of-type(2) {
+  background-color: transparent;
+  position: absolute;
+  border: 0;
+}
