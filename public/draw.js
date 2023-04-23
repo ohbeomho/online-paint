@@ -135,12 +135,13 @@ window.addEventListener("DOMContentLoaded", () => {
   ctx.fillStyle = ctx.strokeStyle = pctx.fillStyle = pctx.strokeStyle = "black";
   pctx.lineWidth = ctx.lineWidth = 10;
 
-  previewCanvas.style.left = `${canvas.offsetLeft}px`;
-  previewCanvas.style.top = `${canvas.offsetTop}px`;
+  // +1 because main canvas has 1px border.
+  previewCanvas.style.left = `${canvas.offsetLeft + 1}px`;
+  previewCanvas.style.top = `${canvas.offsetTop + 1}px`;
 });
 window.addEventListener("resize", () => {
-  previewCanvas.style.left = `${canvas.offsetLeft}px`;
-  previewCanvas.style.top = `${canvas.offsetTop}px`;
+  previewCanvas.style.left = `${canvas.offsetLeft + 1}px`;
+  previewCanvas.style.top = `${canvas.offsetTop + 1}px`;
 });
 
 previewCanvas.addEventListener("mousedown", (e) => {
