@@ -7,7 +7,8 @@ import { Server } from "socket.io";
 
 type ClientToServerEvents = {
   setName: (username: string) => void;
-  updateCanvas: (canvasImage: any) => void;
+  updateCanvas: (canvasImage: string) => void;
+  draw: (data: any) => void;
 };
 
 type SetNameResponse = {
@@ -16,12 +17,13 @@ type SetNameResponse = {
 };
 
 type ServerToClientEvents = {
-  oldCanvas: (canvasImage?: any) => void;
+  oldCanvas: (canvasImage?: string) => void;
   oldUsers: (users: string[]) => void;
   setName: (res: SetNameResponse) => void;
   updateCanvas: (canvasImage: any) => void;
   join: (username: string) => void;
   leave: (username: string) => void;
+  draw: (data: any, username: string) => void;
 };
 
 type SocketData = {
@@ -40,7 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 
 const onlineUsers: string[] = [];
-let latestCanvasImage: any | undefined;
+let latestCanvasImage: string | undefined;
 
 app.get("/", (req, res) => res.sendFile(path.join(__dirname, "view", "index.html")));
 app.get("/draw", (req, res) => res.sendFile(path.join(__dirname, "view", "draw.html")));
@@ -65,10 +67,8 @@ io.on("connection", (socket) => {
     socket.broadcast.emit("join", username);
   });
 
-  socket.on("updateCanvas", (canvasImage) => {
-    socket.broadcast.emit("updateCanvas", canvasImage);
-    latestCanvasImage = canvasImage;
-  });
+  socket.on("updateCanvas", (canvasImage) => (latestCanvasImage = canvasImage));
+  socket.on("draw", (data) => socket.broadcast.emit("draw", data, String(socket.data.username)));
   socket.on("disconnect", () => {
     onlineUsers.splice(onlineUsers.indexOf(String(socket.data.username)), 1);
 
