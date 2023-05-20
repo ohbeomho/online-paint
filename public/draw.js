@@ -17,8 +17,8 @@ const nameElements = [];
 const modes = ["draw", "erase", "line", "rectangle"];
 let currentMode = 0;
 
-const drawSize = 15;
-const eraseSize = 30;
+const drawSize = 10;
+const eraseSize = 20;
 
 let clickPos, dragPos;
 let pressing = false;
@@ -65,14 +65,32 @@ socket.on("draw", (data, username) => {
   }
 
   if (data.mode === 0 || data.mode === 1) {
-    for (let pos of data.posArray) {
-      const size = data.mode === 0 ? drawSize : eraseSize;
-      ctx.fillStyle = data.mode === 0 ? "black" : "white";
+    const size = data.mode === 0 ? drawSize : eraseSize;
+    ctx.fillStyle = data.mode === 0 ? "black" : "white";
 
-      ctx.fillRect(pos.x - size / 2, pos.y - size / 2, size, size);
+    let previousPos;
+
+    for (let pos of data.posArray) {
+      ctx.beginPath();
+      ctx.arc(pos.x, pos.y, size, 0, 2 * Math.PI);
+      ctx.fill();
+
+      if (previousPos) {
+        ctx.lineWidth = size * 2;
+        ctx.strokeStyle = ctx.fillStyle;
+
+        ctx.beginPath();
+        ctx.moveTo(previousPos.x, previousPos.y);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      }
+
+      previousPos = pos;
     }
 
     ctx.fillStyle = "black";
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 10;
 
     nameElement.element.style.left = `${
       canvas.offsetLeft + data.posArray[data.posArray.length - 1].x
@@ -179,7 +197,9 @@ previewCanvas.addEventListener("mousedown", (e) => {
     const size = currentMode === 0 ? drawSize : eraseSize;
     ctx.fillStyle = currentMode === 0 ? "black" : "white";
 
-    ctx.fillRect(clickPos.x - size / 2, clickPos.y - size / 2, size, size);
+    ctx.beginPath();
+    ctx.arc(clickPos.x, clickPos.y, size, 0, 2 * Math.PI);
+    ctx.fill();
 
     posArray.push(clickPos);
     sendDraw({ posArray });
@@ -191,6 +211,7 @@ previewCanvas.addEventListener("mousemove", (e) => {
     return;
   }
 
+  let previousPos = dragPos;
   dragPos = { x: e.offsetX, y: e.offsetY };
   ctx.fillStyle = "black";
 
@@ -198,7 +219,22 @@ previewCanvas.addEventListener("mousemove", (e) => {
     const size = currentMode === 0 ? drawSize : eraseSize;
     ctx.fillStyle = currentMode === 0 ? "black" : "white";
 
-    ctx.fillRect(dragPos.x - size / 2, dragPos.y - size / 2, size, size);
+    ctx.beginPath();
+    ctx.arc(dragPos.x, dragPos.y, size, 0, 2 * Math.PI);
+    ctx.fill();
+
+    if (previousPos) {
+      ctx.lineWidth = size * 2;
+      ctx.strokeStyle = ctx.fillStyle;
+
+      ctx.beginPath();
+      ctx.moveTo(previousPos.x, previousPos.y);
+      ctx.lineTo(dragPos.x, dragPos.y);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 10;
 
     posArray.push(dragPos);
 

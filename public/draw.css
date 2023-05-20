@@ -1,13 +1,9 @@
 .user-list {
-  width: 70vw;
-  min-width: 1000px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(4, 20px);
-  gap: 5px;
+  min-width: 100px;
   padding: 10px;
   position: absolute;
-  bottom: 0;
+  left: 0;
+  top: 0;
   user-select: none;
 }
 
@@ -15,6 +11,8 @@
   background-color: rgba(0, 0, 0, 0.7);
   color: white;
   border-radius: 10px;
+  padding: 4px;
+  margin: 2px 0;
 }
 
 .mode-selector {
@@ -43,6 +41,7 @@
   background-color: rgba(0, 0, 0, 0.7);
   position: absolute;
   left: 0;
+  bottom: 0;
   text-align: left;
 }
 
